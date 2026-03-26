@@ -1,4 +1,4 @@
-#VRML_SIM R2023b utf8
+#VRML_SIM R2025a utf8
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
@@ -16,39 +16,66 @@ WorldInfo {
     }
   ]
 }
-
 Viewpoint {
-  orientation 0.139 0.177 -0.974 1.68
-  position 0.231 2.5 1.96
+  orientation 0.3569039187446305 0.3731872512828071 -0.8563590767106454 1.8214442099995214
+  position 0.25993844335962785 1.4468220955541762 2.3835659124720183
 }
-
 TexturedBackground {
 }
-
 TexturedBackgroundLight {
 }
-
 RectangleArena {
   floorSize 3 3
-  floorTileSize 0.5 0.5
   wallHeight 0.05
 }
-
 Table {
-  translation 0 0 0
   name "work_table"
   size 1.2 0.8 0.74
   feetSize 0.05 0.05
-  legAppearance PBRAppearance { baseColor 0.6 0.6 0.6 roughness 0.8 }
-  trayAppearance PBRAppearance { baseColor 0.85 0.85 0.85 roughness 0.3 }
+  trayAppearance PBRAppearance {
+    baseColor 0.85 0.85 0.85
+    roughness 0.3
+  }
+  legAppearance PBRAppearance {
+    baseColor 0.6 0.6 0.6
+    roughness 0.8
+  }
 }
-
 UR5e {
+  hidden position_0_0 2.7706186494784678e-05
+  hidden rotation_1 0 0 1 2.770619187535272e-05
+  hidden position_1_0 -6.402214295953002e-05
+  hidden rotation_2 0 1 0 1.5707319778570406
+  hidden position_2_0 -4.180748827220526e-05
+  hidden rotation_3 0 -1 0 4.1807485599073716e-05
+  hidden position_3_0 -1.4264053229009827e-05
+  hidden rotation_4 0 0.9999999999999999 0 1.5707817359467708
+  hidden position_4_0 8.199321941927883e-06
+  hidden rotation_5 0 0 1 8.199322479476932e-06
+  hidden position_5_0 -8.254338697666026e-06
+  hidden rotation_6 0 -1 0 8.254328739039458e-06
+  hidden position_7_0 1.8336667577160913e-07
+  hidden position_7_1 1.8336667658513888e-07
+  hidden position_7_2 0.049499947322628544
+  hidden rotation_8 0.7068252250603845 0.707388225240528 3.064805064310998e-06 3.1415981297114013
+  hidden position_8_0 0.0495000526801558
+  hidden rotation_9 0 0 0.9999999999999999 4.2146848510894035e-08
+  hidden position_9_0 7.659817370219877e-09
+  hidden rotation_10 0 0 -1 0.5199999923401823
+  hidden position_10_0 -0.052300000000016784
+  hidden rotation_12 0.7068252250603845 0.707388225240528 3.0648050645985097e-06 3.1415981297114017
+  hidden position_12_0 0.04950005268007811
+  hidden rotation_13 0 0 1 5.16191365590357e-08
+  hidden position_13_0 7.659806149312329e-09
+  hidden rotation_14 0 0 -1 0.5199999923401936
+  hidden position_14_0 -0.052300000000015744
+  hidden rotation_16 0 0 -1 5.16191365590357e-08
+  hidden position_16_0 -7.659257947966768e-09
+  hidden rotation_17 0 0 -1 0.5200000076592579
+  hidden position_17_0 -0.05229999999998368
   translation -0.4 0 0.74
-  rotation 0 0 1 0
   name "ur5e"
   controller "lab6"
-  controllerArgs []
   supervisor TRUE
   selfCollision FALSE
   toolSlot [
@@ -56,21 +83,104 @@ UR5e {
     }
   ]
 }
-
 DEF BLOCK Solid {
-  translation 0.3 -0.15 0.79
-  children [ Shape { appearance PBRAppearance { baseColor 0.85 0.15 0.15 roughness 0.4 } geometry Box { size 0.05 0.05 0.05 } } ]
-  name "block" boundingObject Box { size 0.05 0.05 0.05 } physics Physics { density -1 mass 0.1 }
+  translation 0.3 -0.15 0.7649901899999998
+  rotation 0.34445798737501754 -0.934957394303608 0.08487264441832963 5.4148103679756995e-17
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.85 0.15 0.15
+        roughness 0.4
+      }
+      geometry Box {
+        size 0.05 0.05 0.05
+      }
+    }
+  ]
+  name "block"
+  boundingObject Box {
+    size 0.05 0.05 0.05
+  }
+  physics Physics {
+    density -1
+    mass 0.1
+  }
+  linearVelocity 7.588784501837431e-19 2.9757602916172797e-18 7.267473501346741e-15
+  angularVelocity -3.330669073875465e-16 -1.6653345369377328e-16 -8.336514237512603e-18
 }
-
 DEF BIN Solid {
   translation 0.3 0.2 0.745
   children [
-    Shape { appearance PBRAppearance { baseColor 0.2 0.6 0.2 roughness 0.6 transparency 0.3 } geometry Box { size 0.15 0.15 0.005 } }
-    Pose { translation 0 -0.074 0.025 children [ Shape { appearance PBRAppearance { baseColor 0.2 0.6 0.2 roughness 0.6 transparency 0.3 } geometry Box { size 0.15 0.002 0.05 } } ] }
-    Pose { translation 0 0.074 0.025 children [ Shape { appearance PBRAppearance { baseColor 0.2 0.6 0.2 roughness 0.6 transparency 0.3 } geometry Box { size 0.15 0.002 0.05 } } ] }
-    Pose { translation -0.074 0 0.025 children [ Shape { appearance PBRAppearance { baseColor 0.2 0.6 0.2 roughness 0.6 transparency 0.3 } geometry Box { size 0.002 0.15 0.05 } } ] }
-    Pose { translation 0.074 0 0.025 children [ Shape { appearance PBRAppearance { baseColor 0.2 0.6 0.2 roughness 0.6 transparency 0.3 } geometry Box { size 0.002 0.15 0.05 } } ] }
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.2 0.6 0.2
+        transparency 0.3
+        roughness 0.6
+      }
+      geometry Box {
+        size 0.15 0.15 0.005
+      }
+    }
+    Pose {
+      translation 0 -0.074 0.025
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.2 0.6 0.2
+            transparency 0.3
+            roughness 0.6
+          }
+          geometry Box {
+            size 0.15 0.002 0.05
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0 0.074 0.025
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.2 0.6 0.2
+            transparency 0.3
+            roughness 0.6
+          }
+          geometry Box {
+            size 0.15 0.002 0.05
+          }
+        }
+      ]
+    }
+    Pose {
+      translation -0.074 0 0.025
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.2 0.6 0.2
+            transparency 0.3
+            roughness 0.6
+          }
+          geometry Box {
+            size 0.002 0.15 0.05
+          }
+        }
+      ]
+    }
+    Pose {
+      translation 0.074 0 0.025
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.2 0.6 0.2
+            transparency 0.3
+            roughness 0.6
+          }
+          geometry Box {
+            size 0.002 0.15 0.05
+          }
+        }
+      ]
+    }
   ]
   name "bin"
 }

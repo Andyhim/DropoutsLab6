@@ -114,8 +114,14 @@ def forward_kinematics(q):
     Returns:
         position : numpy array [x, y, z] in robot base frame
     """
-    raise NotImplementedError("TODO: Implement forward_kinematics()")
-
+    T = np.eye(4)
+    for i in range(len(q)):
+        dh = _dh(UR5E_DH_A[i], UR5E_DH_D[i], UR5E_DH_ALPHA[i], q[i])
+        T = T @ dh
+        #print(T)
+    translation = T[0:3, -1]
+    #translation += [0, 0, GRIPPER_OFFSET]
+    print(f"End effector position (without gripper offset): {translation}")
 
 # ============================================================
 # TASK 2: Numerical Jacobian (15 pts)
@@ -192,7 +198,7 @@ def pick_and_place(arm, block_world, bin_world):
 # MAIN — DO NOT MODIFY
 # ============================================================
 def main():
-    raise NotImplementedError("TODO: Implement main() to run the pick-and-place demo.")
+    forward_kinematics(HOME)
 
 
 if __name__ == "__main__":
