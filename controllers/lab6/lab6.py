@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import copy
 
 try:
     from controller import Supervisor
@@ -76,6 +77,9 @@ ROBOT_POS = None  # Set at runtime from Supervisor
 
 HOME = [0.0, -1.5708, 1.5708, -1.5708, -1.5708, 0.0]
 
+BLOCK_WORLD = [0.3, -0.15, 0.765]
+BIN_WORLD = [0.3, 0.2, 0.745]
+
 
 # ============================================================
 # PROVIDED: Coordinate Transforms (DO NOT MODIFY)
@@ -93,6 +97,8 @@ def _dh(a, d, alpha, theta):
 
 def world_to_base(pw):
     """Convert world position to DH base frame."""
+    print(np.array(pw))
+    print(ROBOT_POS)
     return R_PROTO.T @ (np.array(pw) - ROBOT_POS)
 
 
@@ -118,10 +124,11 @@ def forward_kinematics(q):
     for i in range(len(q)):
         dh = _dh(UR5E_DH_A[i], UR5E_DH_D[i], UR5E_DH_ALPHA[i], q[i])
         T = T @ dh
-        #print(T)
-    translation = T[0:3, -1]
-    #translation += [0, 0, GRIPPER_OFFSET]
-    print(f"End effector position (without gripper offset): {translation}")
+    
+    gripper_offset_local = np.array([0, 0, GRIPPER_OFFSET])
+    translation = T[0:3, 3] + T[0:3, 0:3] @ gripper_offset_local
+
+    return translation
 
 # ============================================================
 # TASK 2: Numerical Jacobian (15 pts)
@@ -138,7 +145,16 @@ def compute_jacobian(q, delta=1e-5):
         J : numpy array (3, 6)
     """
     # TODO: Implement (~8-10 lines)
-    raise NotImplementedError("TODO: Implement compute_jacobian()")
+    J = np.zeros((3, 6))
+    for i in range(len(q)):
+        delta_ei = np.zeros(6)
+        delta_ei[i] = delta
+        fk_pos = forward_kinematics(q + delta_ei)
+        fk_neg = forward_kinematics(q - delta_ei)
+        J_col = (fk_pos - fk_neg) / (2 * delta)
+        J[:, i] = J_col
+    return J
+        
 
 
 # ============================================================
@@ -156,7 +172,18 @@ def get_waypoints(block_world, bin_world):
         dict with keys: 'above_block', 'at_block', 'above_bin'
         Each value is a list [x, y, z] in world frame.
     """
-    raise NotImplementedError("TODO: Implement get_waypoints()")
+    above_block = copy.deepcopy(block_world)
+    above_block[2] = above_block[2] + 0.2
+    print(f"above_block type: {type(above_block)}")
+
+    at_block = copy.deepcopy(block_world)
+    at_block[2] = at_block[2] + 0.02
+
+    above_bin = copy.deepcopy(bin_world)
+    above_bin[2] = above_bin[2] + 0.2
+
+    return {"above_block": above_block, "at_block": at_block, "above_bin": above_bin}
+    
 
 
 # ============================================================
@@ -179,7 +206,28 @@ def gradient_descent_ik(target_world, q_init, learning_rate,
         converged  : bool
         errors     : list of position error at each iteration
     """
-    raise NotImplementedError("TODO: Implement gradient_descent_ik()")
+    errors = []
+    q_solution = np.zeros([6,])
+    converged = False
+    q = q_init
+
+    target_base = world_to_base(target_world)
+
+    for i in range(max_iterations):
+        error = target_base - forward_kinematics(q)
+        errors.append(error)
+        if np.linalg.norm(error) < tolerance:
+            converged = True
+            q_solution = q
+
+        J = compute_jacobian(q)
+        q = q + learning_rate * np.transpose(J) @ error
+
+        q[np.where(q > 2 * np.pi)] = 2 * np.pi
+        q[np.where(q < -2 * np.pi)] = -2 * np.pi
+    
+    return q_solution, converged, errors
+    
 
 
 # ============================================================
@@ -199,6 +247,40 @@ def pick_and_place(arm, block_world, bin_world):
 # ============================================================
 def main():
     forward_kinematics(HOME)
+    print(compute_jacobian(HOME))
+
+    robot = Supervisor()
+    node = robot.getSelf()
+    global ROBOT_POS
+    ROBOT_POS = np.array(node.getPosition())
+
+    arm = UR5eInterface(robot)
+
+    arm.set_speed(0.6)
+
+    waypoints = get_waypoints(BLOCK_WORLD, BIN_WORLD)
+    above_block = waypoints["above_block"]
+    at_block = waypoints["at_block"]
+    above_bin = waypoints["above_bin"]
+
+    q_solution, converged, errors = gradient_descent_ik(above_block, HOME, 0.5, 1000, 0.1)
+    print(f"Converged? - {converged}")
+    arm.move_to(q_solution, wait_time=3)
+
+    q_solution, converged, errors = gradient_descent_ik(at_block, q_solution, 0.5, 1000, 0.1)
+    arm.move_to(q_solution, wait_time=1.5)
+
+    arm.close_gripper()
+    arm.wait(1.5)
+
+    q_solution, converged, errors = gradient_descent_ik(above_block, q_solution, 0.5, 1000, 0.1)
+    arm.move_to(q_solution, wait_time=1.5)
+
+    q_solution, converged, errors = gradient_descent_ik(above_bin, q_solution, 0.5, 1000, 0.1)
+    arm.move_to(q_solution, wait_time=1.5)
+
+    arm.open_gripper()
+    arm.wait(1.5)
 
 
 if __name__ == "__main__":
